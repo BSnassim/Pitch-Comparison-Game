@@ -4,6 +4,21 @@ window.addEventListener('load', function () {
     const bgCtx = bgCanvas.getContext('2d');
     bgCanvas.width = 700;
     bgCanvas.height = 500;
+    // main menu canvas
+    const menuCanvas = document.getElementById('mainmenu');
+    const menuCtx = menuCanvas.getContext('2d');
+    menuCanvas.width = 700;
+    menuCanvas.height = 500;
+    // speakers canvas
+    const speakerRCanvas = document.getElementById('speakerR');
+    const speakerRCtx = speakerRCanvas.getContext('2d');
+    speakerRCanvas.width = 700;
+    speakerRCanvas.height = 500;
+    // speakers canvas
+    const speakerLCanvas = document.getElementById('speakerL');
+    const speakerLCtx = speakerLCanvas.getContext('2d');
+    speakerLCanvas.width = 700;
+    speakerLCanvas.height = 500;
     // popup canvas
     const popupCanvas = document.getElementById('popup');
     const popupCtx = popupCanvas.getContext('2d');
@@ -32,26 +47,40 @@ window.addEventListener('load', function () {
 
     const successPopup = () => {
         popupCtx.font = "30px Arial";
-        popupCtx.fillStyle = "grey";
-        popupCtx.fillRect(240, 50, 230, 100); // background
+        popupCtx.fillStyle = "rgb(75, 173, 66)";
+        popupCtx.beginPath();
+        popupCtx.moveTo(270, 75);
+        popupCtx.arcTo(470, 75, 470, 155, 30);
+        popupCtx.arcTo(470, 155, 240, 155, 30);
+        popupCtx.arcTo(240, 155, 240, 75, 30);
+        popupCtx.arcTo(240, 75, 470, 75, 30);
+        popupCtx.closePath();
+        popupCtx.fill();
         popupCtx.strokeStyle = "black";
         popupCtx.lineWidth = 2;
-        popupCtx.strokeRect(240, 50, 230, 100); // border
+        popupCtx.stroke();
         popupCtx.fillStyle = "white";
-        popupCtx.fillText("Good job !", 280, 105);
+        popupCtx.fillText("Good job !", 280, 120);
         setTimeout(() => {
             popupCtx.clearRect(0, 0, canvas.width, canvas.height)
         }, 2000);
     }
     const failurePopup = () => {
         popupCtx.font = "30px Arial";
-        popupCtx.fillStyle = "grey";
-        popupCtx.fillRect(240, 50, 230, 100); // background
+        popupCtx.fillStyle = "rgb(166, 61, 61)";
+        popupCtx.beginPath();
+        popupCtx.moveTo(270, 75);
+        popupCtx.arcTo(470, 75, 470, 155, 30);
+        popupCtx.arcTo(470, 155, 240, 155, 30);
+        popupCtx.arcTo(240, 155, 240, 75, 30);
+        popupCtx.arcTo(240, 75, 470, 75, 30);
+        popupCtx.closePath();
+        popupCtx.fill();
         popupCtx.strokeStyle = "black";
         popupCtx.lineWidth = 2;
-        popupCtx.strokeRect(240, 50, 230, 100); // border
+        popupCtx.stroke();
         popupCtx.fillStyle = "white";
-        popupCtx.fillText("Try again", 290, 105);
+        popupCtx.fillText("Try again !", 280, 120);
         setTimeout(() => {
             popupCtx.clearRect(0, 0, canvas.width, canvas.height)
         }, 2000);
@@ -78,6 +107,12 @@ window.addEventListener('load', function () {
 
             this.A = noteA;
             this.B = noteB;
+            notes[this.A].play();
+            this.animateRightSpeaker();
+            setTimeout(() => {
+                notes[this.B].play();
+                this.animateLeftSpeaker();
+            }, 2000);
         }
         rightSpeakerClick(x, y) {
             // top left positions of element
@@ -98,6 +133,7 @@ window.addEventListener('load', function () {
                 console.log("posx:", posx, "posy:", posy, "endx:", endx, "endy:", endy, "click:", x, y)
                 console.log("Right speaker was clicked!");
                 notes[this.B].play();
+                this.animateLeftSpeaker();
             }
         }
         leftSpeakerClick(x, y) {
@@ -117,9 +153,22 @@ window.addEventListener('load', function () {
                     }
                 });
                 console.log("posx:", posx, "posy:", posy, "endx:", endx, "endy:", endy, "click:", x, y)
-                console.log("Right speaker was clicked!");
+                console.log("Left speaker was clicked!");
                 notes[this.A].play();
+                this.animateRightSpeaker();
             }
+        }
+        animateLeftSpeaker() {
+            speakerLCanvas.classList.add('animate');
+            setTimeout(() => {
+                speakerLCanvas.classList.remove('animate');
+            }, 2000);
+        }
+        animateRightSpeaker() {
+            speakerRCanvas.classList.add('animate');
+            setTimeout(() => {
+                speakerRCanvas.classList.remove('animate');
+            }, 2000);
         }
         buttonAClick(x, y) {
             // top left positions of element
@@ -133,7 +182,7 @@ window.addEventListener('load', function () {
                 console.log("posx:", posx, "posy:", posy, "endx:", endx, "endy:", endy, "click:", x, y)
                 console.log("Button A was clicked!");
                 // Display the text message
-                if (this.A>this.B){
+                if (this.A > this.B) {
                     successPopup();
                     this.setNotesAB();
                 } else {
@@ -153,7 +202,7 @@ window.addEventListener('load', function () {
                 console.log("posx:", posx, "posy:", posy, "endx:", endx, "endy:", endy, "click:", x, y)
                 console.log("Button B was clicked!");
                 // Display the text message
-                if (this.B>this.A){
+                if (this.B > this.A) {
                     successPopup();
                     this.setNotesAB();
                 } else {
@@ -161,14 +210,66 @@ window.addEventListener('load', function () {
                 }
             }
         }
+        startGame() {
+            this.setNotesAB();
+            this.drawGameplay(ctx);
+        }
+        drawMainMenu(context) {
+            // Drawing start game button
+            const buttonWidth = 200;
+            const buttonHeight = 50;
+            const buttonX = (canvas.width - buttonWidth) / 2;
+            const buttonY = (canvas.height - buttonHeight) / 2;
 
+            context.fillStyle = "rgb(96, 149, 181)";
+            context.strokeStyle = "black";
+            context.lineWidth = 2;
+            context.beginPath();
+            context.moveTo(buttonX + 10, buttonY);
+            context.lineTo(buttonX + buttonWidth - 10, buttonY);
+            context.quadraticCurveTo(buttonX + buttonWidth, buttonY, buttonX + buttonWidth, buttonY + 10);
+            context.lineTo(buttonX + buttonWidth, buttonY + buttonHeight - 10);
+            context.quadraticCurveTo(buttonX + buttonWidth, buttonY + buttonHeight, buttonX + buttonWidth - 10, buttonY + buttonHeight);
+            context.lineTo(buttonX + 10, buttonY + buttonHeight);
+            context.quadraticCurveTo(buttonX, buttonY + buttonHeight, buttonX, buttonY + buttonHeight - 10);
+            context.lineTo(buttonX, buttonY + 10);
+            context.quadraticCurveTo(buttonX, buttonY, buttonX + 10, buttonY);
+            context.closePath();
+            context.fill();
+            context.stroke();
+
+            context.fillStyle = "white";
+            context.font = "20px Arial";
+            context.textAlign = "center";
+            context.textBaseline = "middle";
+            context.fillText("Start game", buttonX + buttonWidth / 2, buttonY + buttonHeight / 2);
+
+            // add onclick on canvas
+            menuCanvas.addEventListener("click", (e) => {
+                // cursor offset
+                const x = e.offsetX;
+                const y = e.offsetY;
+                // top left positions of element
+                const posx = buttonX;
+                const posy = buttonY;
+                // bottom right positions of element
+                const endx = posx + buttonWidth;
+                const endy = posy + buttonHeight;
+                // action
+                if ((x > posx && y > posy) && (x < endx && y < endy)) {
+                    console.log("Start game!");
+                    menuCanvas.style.display = "none";
+                    this.startGame();
+                }
+            })
+        }
         drawGameplay(context) {
             // display left and right speakers on top
-            speakerRightImage.onload = () => {
-                context.drawImage(speakerLeftImage, 50, 50, 200, 200);
-            }
             speakerLeftImage.onload = () => {
-                context.drawImage(speakerRightImage, canvas.width - 250, 50, 200, 200);
+                speakerLCtx.drawImage(speakerLeftImage, canvas.width - 250, 50, 200, 200);
+            }
+            speakerRightImage.onload = () => {
+                speakerRCtx.drawImage(speakerRightImage, 50, 50, 200, 200);
             }
 
             // A and B buttons
@@ -179,15 +280,20 @@ window.addEventListener('load', function () {
                 context.drawImage(buttonBImage, 500, 300, 85, 70);
             }
 
+            // Setting images src
+            speakerLeftImage.src = 'assets/speaker-left.png';
+            speakerRightImage.src = 'assets/speaker-right.png';
+            buttonAImage.src = 'assets/buttonA.png';
+            buttonBImage.src = 'assets/buttonB.png';
             // Text
-            ctx.font = "30px Arial";
-            ctx.fillStyle = "rgb(89, 156, 240)";
-            ctx.fillRect(140, 400, 460, 80); // background
-            ctx.strokeStyle = "black";
-            ctx.lineWidth = 2;
-            ctx.strokeRect(140, 400, 460, 80); // border
-            ctx.fillStyle = "black";
-            ctx.fillText("Which tone has the higher pitch ?", 150, 450);
+            context.font = "30px Arial";
+            context.fillStyle = "rgb(89, 156, 240)";
+            context.fillRect(110, 400, 460, 80); // background
+            context.strokeStyle = "black";
+            context.lineWidth = 2;
+            context.strokeRect(110, 400, 460, 80); // border
+            context.fillStyle = "black";
+            context.fillText("Which tone has the higher pitch ?", 120, 450);
 
             // add onclick on canvas
             popupCanvas.addEventListener("click", (e) => {
@@ -200,8 +306,6 @@ window.addEventListener('load', function () {
                 this.buttonBClick(x, y)
 
             })
-
-
         }
     }
 
@@ -211,18 +315,12 @@ window.addEventListener('load', function () {
     backgroundImage.onload = () => {
         bgCtx.drawImage(backgroundImage, 0, 0, canvas.width, canvas.height);
     }
+    backgroundImage.src = 'assets/background.jpg';
 
     function animate() {
-        game.setNotesAB();
-        game.drawGameplay(ctx);
+        game.drawMainMenu(menuCtx);
     }
     window.addEventListener("load", animate());
 
 
-    // Setting images src
-    backgroundImage.src = 'assets/background.jpg';
-    speakerLeftImage.src = 'assets/speaker-left.png';
-    speakerRightImage.src = 'assets/speaker-right.png';
-    buttonAImage.src = 'assets/buttonA.png';
-    buttonBImage.src = 'assets/buttonB.png';
 });
