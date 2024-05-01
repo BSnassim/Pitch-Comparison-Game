@@ -96,6 +96,24 @@ window.addEventListener('load', function () {
             this.width = width;
             this.height = height;
         }
+        drawSpeakers() {
+            // display left and right speakers on top
+            speakerLeftImage.onload = () => {
+                speakerLCtx.drawImage(speakerLeftImage, canvas.width - 250, 50, 200, 200);
+            }
+            speakerRightImage.onload = () => {
+                speakerRCtx.drawImage(speakerRightImage, 50, 50, 200, 200);
+            }
+        }
+        drawButtons(context) {
+            // A and B buttons
+            buttonAImage.onload = () => {
+                context.drawImage(buttonAImage, 100, 300, 85, 70);
+            }
+            buttonBImage.onload = () => {
+                context.drawImage(buttonBImage, 500, 300, 85, 70);
+            }
+        }
         setNotesAB() {
             // Set random notes to A & B
             let noteA = Math.floor(Math.random() * 24) + 1;
@@ -158,18 +176,84 @@ window.addEventListener('load', function () {
                 this.animateRightSpeaker();
             }
         }
-        animateLeftSpeaker() {
-            speakerLCanvas.classList.add('animate');
-            setTimeout(() => {
-                speakerLCanvas.classList.remove('animate');
-            }, 2000);
-        }
+
         animateRightSpeaker() {
-            speakerRCanvas.classList.add('animate');
-            setTimeout(() => {
-                speakerRCanvas.classList.remove('animate');
-            }, 2000);
+            const startY = 50; // Initial y position
+            let shakeDistance = 5; // How much to shake
+            let currentTime = 0; // Track animation time
+            let isAnimating = true; // Flag to control animation
+
+            const animate = () => {
+                if (!isAnimating) return; // Stop animation if flag is false
+
+                // Clear previous drawing
+                speakerRCtx.clearRect(0, 0, speakerRCanvas.width, speakerRCanvas.height);
+
+                // Calculate next position (shaking up and down)
+                const currentY = startY + shakeDistance * Math.sin(currentTime * Math.PI * 2);
+
+                // Draw speaker at current position
+                speakerRCtx.drawImage(speakerRightImage, 50, currentY, 200, 200);
+
+                // Update animation time
+                currentTime += 0.02; // Adjust speed as needed
+
+                // Stop animation after 1 second
+                if (currentTime >= 1) {
+                    isAnimating = false;
+                    // setTimeout(() => {
+                    //     // Clear the canvas after animation stops
+                    //     speakerRCtx.clearRect(0, 0, speakerRCanvas.width, speakerRCanvas.height);
+                    // }, 100);
+                    return;
+                }
+
+                // Continue animation
+                requestAnimationFrame(animate);
+            };
+
+            // Start animation loop
+            animate();
         }
+        animateLeftSpeaker() {
+            const startY = 50; // Initial y position
+            let shakeDistance = 5; // How much to shake
+            let currentTime = 0; // Track animation time
+            let isAnimating = true; // Flag to control animation
+
+            const animate = () => {
+                if (!isAnimating) return; // Stop animation if flag is false
+
+                // Clear previous drawing
+                speakerLCtx.clearRect(0, 0, speakerLCanvas.width, speakerLCanvas.height);
+
+                // Calculate next position (shaking up and down)
+                const currentY = startY + shakeDistance * Math.sin(currentTime * Math.PI * 2);
+
+                // Draw speaker at current position
+                speakerLCtx.drawImage(speakerLeftImage, speakerLCanvas.width - 250, currentY, 200, 200);
+
+                // Update animation time
+                currentTime += 0.02; // Adjust speed as needed
+
+                // Stop animation after 1 second
+                if (currentTime >= 1) {
+                    isAnimating = false;
+                    // setTimeout(() => {
+                    //     // Clear the canvas after animation stops
+                    //     speakerLCtx.clearRect(0, 0, speakerLCanvas.width, speakerLCanvas.height);
+                    // }, 100);
+                    return;
+                }
+
+                // Continue animation
+                requestAnimationFrame(animate);
+            };
+
+            // Start animation loop
+            animate();
+        }
+
         buttonAClick(x, y) {
             // top left positions of element
             const posx = 100;
@@ -184,7 +268,9 @@ window.addEventListener('load', function () {
                 // Display the text message
                 if (this.A > this.B) {
                     successPopup();
-                    this.setNotesAB();
+                    setTimeout(() => {
+                        this.setNotesAB();
+                    }, 2000);
                 } else {
                     failurePopup();
                 }
@@ -264,22 +350,8 @@ window.addEventListener('load', function () {
             })
         }
         drawGameplay(context) {
-            // display left and right speakers on top
-            speakerLeftImage.onload = () => {
-                speakerLCtx.drawImage(speakerLeftImage, canvas.width - 250, 50, 200, 200);
-            }
-            speakerRightImage.onload = () => {
-                speakerRCtx.drawImage(speakerRightImage, 50, 50, 200, 200);
-            }
-
-            // A and B buttons
-            buttonAImage.onload = () => {
-                context.drawImage(buttonAImage, 100, 300, 85, 70);
-            }
-            buttonBImage.onload = () => {
-                context.drawImage(buttonBImage, 500, 300, 85, 70);
-            }
-
+            this.drawSpeakers();
+            this.drawButtons(context);
             // Setting images src
             speakerLeftImage.src = 'assets/speaker-left.png';
             speakerRightImage.src = 'assets/speaker-right.png';
@@ -309,6 +381,8 @@ window.addEventListener('load', function () {
         }
     }
 
+
+
     const game = new Game(canvas.width, canvas.height);
     console.log(game);
     // background image
@@ -321,6 +395,5 @@ window.addEventListener('load', function () {
         game.drawMainMenu(menuCtx);
     }
     window.addEventListener("load", animate());
-
 
 });
