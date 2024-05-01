@@ -331,23 +331,27 @@ window.addEventListener('load', function () {
             context.fillText("Start game", buttonX + buttonWidth / 2, buttonY + buttonHeight / 2);
 
             // add onclick on canvas
-            menuCanvas.addEventListener("click", (e) => {
-                // cursor offset
-                const x = e.offsetX;
-                const y = e.offsetY;
-                // top left positions of element
-                const posx = buttonX;
-                const posy = buttonY;
-                // bottom right positions of element
-                const endx = posx + buttonWidth;
-                const endy = posy + buttonHeight;
-                // action
-                if ((x > posx && y > posy) && (x < endx && y < endy)) {
+            menuCanvas.addEventListener("pointerdown", (e) => {
+                // Calculate scaling factors
+                const scaleX = menuCanvas.width / menuCanvas.offsetWidth;
+                const scaleY = menuCanvas.height / menuCanvas.offsetHeight;
+
+                // Adjust click event coordinates
+                const x = e.offsetX * scaleX;
+                const y = e.offsetY * scaleY;
+
+                // Calculate button position and size relative to current canvas size
+                const buttonX = (menuCanvas.width - buttonWidth) / 2;
+                const buttonY = (menuCanvas.height - buttonHeight) / 2;
+
+                // Action
+                if (x > buttonX && x < buttonX + buttonWidth && y > buttonY && y < buttonY + buttonHeight) {
                     console.log("Start game!");
                     menuCanvas.style.display = "none";
-                    this.startGame();
+                    game.startGame();
                 }
-            })
+            });
+
         }
         drawGameplay(context) {
             this.drawSpeakers();
@@ -368,10 +372,14 @@ window.addEventListener('load', function () {
             context.fillText("Which tone has the higher pitch ?", 120, 450);
 
             // add onclick on canvas
-            popupCanvas.addEventListener("click", (e) => {
-                // cursor offset
-                const x = e.offsetX;
-                const y = e.offsetY;
+            popupCanvas.addEventListener("pointerdown", (e) => {
+                // Calculate scaling factors
+                const scaleX = popupCanvas.width / popupCanvas.offsetWidth;
+                const scaleY = popupCanvas.height / popupCanvas.offsetHeight;
+
+                // Adjust click event coordinates
+                const x = e.offsetX * scaleX;
+                const y = e.offsetY * scaleY;
                 this.rightSpeakerClick(x, y);
                 this.leftSpeakerClick(x, y);
                 this.buttonAClick(x, y)
